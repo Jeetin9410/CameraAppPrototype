@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onActivityResult(ActivityResult result) {
 
-                    if (result.getResultCode() == Activity.RESULT_OK) {
+                    if (result.getResultCode() == Activity.RESULT_OK) { // this method will work only when user select any image
                         Uri image_uri = result.getData().getData();
                         imageView.setImageURI(image_uri);
                     }
