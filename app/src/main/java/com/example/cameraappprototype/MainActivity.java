@@ -45,7 +45,9 @@ public class MainActivity extends AppCompatActivity {
 
                     if (result.getResultCode() == Activity.RESULT_OK) { // this method will work only when user select any image
                         Uri image_uri = result.getData().getData();
-                        imageView.setImageURI(image_uri);
+                        Bitmap inputImage = uriToBitmap(image_uri);
+                        Bitmap rotated = rotateBitmap(inputImage);
+                        imageView.setImageBitmap(rotated);
                     }
 
                 }
