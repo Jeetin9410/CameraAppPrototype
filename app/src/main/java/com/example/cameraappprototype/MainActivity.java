@@ -146,6 +146,14 @@ public class MainActivity extends AppCompatActivity {
     //TODO Most phone cameras are landscape, meaning if you take the photo in portrait, the resulting photos will be rotated 90 degrees.
     @SuppressLint("Range")
     public Bitmap rotateBitmap(Bitmap input){
+
+        /*
+        Here uriToBitmap is used to convert an image into a bitmap format and then we will pass that
+         bitmap to rotateBitmap method so that we can get that bitmap in portrait orientation.
+          In most cases when we capture an image using the camera the captured image is in landscape
+           orientation. So we are using this rotateBitmap method to ensure that we get that image is
+            in portrait mode in a bitmap format.
+         */
         String[] orientationColumn = {MediaStore.Images.Media.ORIENTATION};
         Cursor cur = getContentResolver().query(image_uri, orientationColumn, null, null, null);
         int orientation = -1;
