@@ -6,20 +6,29 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.Manifest;
 
+import java.io.FileDescriptor;
+import java.io.IOException;
 import java.security.PrivateKey;
 
 public class MainActivity extends AppCompatActivity {
@@ -50,7 +59,9 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == Activity.RESULT_OK) {
-                        imageView.setImageURI(image_uri);
+                        Bitmap inputImage = uriToBitmap(image_uri);
+                        Bitmap rotated = rotateBitmap(inputImage);
+                        imageView.setImageBitmap(rotated);
                     }
                 }
             });
@@ -115,4 +126,37 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    //TODO takes URI of the image and returns bitmap
+    private Bitmap uriToBitmap(Uri selectedFileUri) {
+        try {
+            ParcelFileDescriptor parcelFileDescriptor =
+                    getContentResolver().openFileDescriptor(selectedFileUri, "r");
+            FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+            Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+            parcelFileDescriptor.close();
+            return image;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return  null;
+    }
+
+    //TODO rotate image if image captured on samsung devices
+    //TODO Most phone cameras are landscape, meaning if you take the photo in portrait, the resulting photos will be rotated 90 degrees.
+    @SuppressLint("Range")
+    public Bitmap rotateBitmap(Bitmap input){
+        String[] orientationColumn = {MediaStore.Images.Media.ORIENTATION};
+        Cursor cur = getContentResolver().query(image_uri, orientationColumn, null, null, null);
+        int orientation = -1;
+        if (cur != null && cur.moveToFirst()) {
+            orientation = cur.getInt(cur.getColumnIndex(orientationColumn[0]));
+        }
+        Log.d("tryOrientation",orientation+"");
+        Matrix rotationMatrix = new Matrix();
+        rotationMatrix.setRotate(orientation);
+        Bitmap cropped = Bitmap.createBitmap(input,0,0, input.getWidth(), input.getHeight(), rotationMatrix, true);
+        return cropped;
+    }
+
 }
