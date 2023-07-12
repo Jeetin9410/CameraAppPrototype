@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
         galleryBtn = findViewById(R.id.button);
         cameraBtn = findViewById(R.id.button2);
-
+        askPermission();
         galleryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
